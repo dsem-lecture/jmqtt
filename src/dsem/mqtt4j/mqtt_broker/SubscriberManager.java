@@ -4,42 +4,45 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.structure.*;
+import dsem.mqtt4j.global.structure.*;
 
 class SubscriberManager extends Thread {
-	Socket socket;
-	private static HashMap<String, ArrayList<PrintWriter>> map;
-	
-	public SubscriberManager(Socket socket, HashMap<String, ArrayList<PrintWriter>> map) {
-		this.socket = socket;
+	Connection conn;
+	private static HashMap<String, ArrayList<Connection>> map;
+
+	public SubscriberManager(Connection conn, HashMap<String, ArrayList<Connection>> map) {
+		super();
+		this.conn = conn;
 		this.map = map;
 	}
-	
+
 	public void run() {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-				PrintWriter writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream()), true)) {
+		try {
 			System.out.println("Client is connected.");
 
-			Message msg = JSONManager.receiveJSONMessage(reader);
-			
-			if ("publisher".equals(msg.topic)) {
-				PublishListener pl = new PublishListener(reader, map);
-				pl.start();
-			} else if ("subscriber".equals(msg.topic)) {
-				if (map.containsKey(msg.topic)) {
-					ArrayList<PrintWriter> writerList = map.get(msg.topic);
-					writerList.add(writer);
-					
+			String recvMessage = this.conn.receiveMessage();
+			Message message = JSONManager.parseMessage(recvMessage);
+
+			if ("mqtt4j//subscriber//join".equals(message.topic)) {
+				if (map.containsKey(message.message)) {
+					ArrayList<Connection> connList = map.get(message.message);
+					connList.add(this.conn);
+
+					System.out.println("New subscriber joined (topic : " + message.message + ")");
 				} else {
-					ArrayList<PrintWriter> writerList = new ArrayList<PrintWriter>();
-					writerList.add(writer);
-					map.put(msg.topic, writerList);
+					ArrayList<Connection> connList = new ArrayList<Connection>();
+					connList.add(this.conn);
+					map.put(message.topic, connList);
+
+					System.out.println("New subscriber joined and new topic registered (topic : " + message.message + ")");
 				}
 			}
-			System.out.println("Client is disconnected.");
-			this.socket.close();
+
+			PublishListener pl = new PublishListener(this.conn, map);
+			pl.start();
+
 		} catch (Exception e) {
-			System.out.println("ClientManager.run");
+			System.out.println("dsem.mqtt4j.mqtt_broker.SubscriberManager.run()");
 			System.out.println(e.getMessage());
 		}
 	}

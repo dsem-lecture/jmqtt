@@ -1,44 +1,40 @@
 package dsem.mqtt4j.mqtt_broker;
 
-import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.structure.*;
 import java.io.*;
 import java.net.*;
 import java.text.*;
 import java.util.*;
+import dsem.mqtt4j.global.*;
+import dsem.mqtt4j.global.structure.*;
 
 public class MQTTBroker {
-	private String ip;
 	private int port;
-	private static HashMap<String, ArrayList<PrintWriter>> map;
+	private static HashMap<String, ArrayList<Connection>> map;
 
 	public MQTTBroker() {		
-		ip = GlobalConfig.default_ip;
-		port = GlobalConfig.default_port;
-
-		map = new HashMap<String, ArrayList<PrintWriter>>();
+		port = GlobalConfig.default_broker_port;
+		map = new HashMap<String, ArrayList<Connection>>();
 	}
 
-	
-	public static void main(String[] args) {
-		new MQTTBroker().start();
-	}
-
-	public void start() {
+	public void startBroker() {
 		try (ServerSocket serverSocket = new ServerSocket(this.port)) {
 			System.out.println("MQTT Broker started");
 
 			while (true) {
 				Socket socket = serverSocket.accept();
-
 				System.out.println("Connection Requested.");
-								
+
+				Connection clientConn = new Connection(socket);
 				
-				SubscriberManager mm = new SubscriberManager(socket, map);
-				mm.run();
+				SubscriberManager sm = new SubscriberManager(clientConn, map);
+				sm.start();
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	public static void main(String[] args) {
+		new MQTTBroker().startBroker();
 	}
 }

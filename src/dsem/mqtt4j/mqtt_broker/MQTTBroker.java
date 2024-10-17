@@ -34,87 +34,11 @@ public class MQTTBroker {
 				System.out.println("Connection Requested.");
 								
 				
-				ClientManager mm = new ClientManager(socket);
+				SubscriberManager mm = new SubscriberManager(socket, map);
 				mm.run();
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-		}
-	}
-	
-	private class ClientManager extends Thread {
-		Socket socket;
-		
-		public ClientManager(Socket socket) {
-			this.socket = socket;
-		}
-		
-		public void run() {
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-					PrintWriter writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream()), true)) {
-				System.out.println("Client is connected.");
-
-				Message msg = JSONManager.receiveJSONMessage(reader);
-				
-				if ("publisher".equals(msg.topic)) {
-					PublishListener pl = new PublishListener(reader);
-					pl.start();
-				} else if ("subscriber".equals(msg.topic)) {
-					if (map.containsKey(msg.topic)) {
-						ArrayList<PrintWriter> writerList = map.get(msg.topic);
-						writerList.add(writer);
-						
-					} else {
-						ArrayList<PrintWriter> writerList = new ArrayList<PrintWriter>();
-						writerList.add(writer);
-						map.put(msg.topic, writerList);
-					}
-				}
-				System.out.println("Client is disconnected.");
-				this.socket.close();
-			} catch (Exception e) {
-				System.out.println("ClientManager.run");
-				System.out.println(e.getMessage());
-			}
-		}
-	}
-	
-	
-	private class PublishListener extends Thread {
-		BufferedReader reader;
-
-		public PublishListener(BufferedReader reader) {
-			super();
-			this.reader = reader;
-		}
-
-		public void publishMessage(Message msg) {
-			ArrayList<PrintWriter> pwlist = map.get(msg.topic);
-			String sendMessage = JSONManager.createJSONMessage(msg);
-			
-			for (int i=0; i<pwlist.size(); i++) {
-				PrintWriter pw = pwlist.get(i);
-				try {
-					pw.println(sendMessage);
-					System.out.println("Send " + i + " > " + sendMessage);
-				} catch (Exception e) {
-					pwlist.remove(i);
-				}
-			}		
-
-		}
-		
-		public void run() {
-			try {
-				while(true) {
-					Message msg = JSONManager.receiveJSONMessage(reader);
-					
-					publishMessage(msg);
-				}
-			} catch (Exception e) {
-				System.out.println("catch");
-				System.out.println(e.getMessage());
-			}
 		}
 	}
 }

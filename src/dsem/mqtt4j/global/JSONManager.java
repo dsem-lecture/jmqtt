@@ -39,7 +39,7 @@ public class JSONManager {
 		}
 		
 		return msgObj;
-	}
+	}	
 	
 	public static String createJSONMessage(Message msg) {
 		JSONObject obj = new JSONObject();

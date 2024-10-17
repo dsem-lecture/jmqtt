@@ -8,11 +8,14 @@ import java.text.*;
 import java.util.*;
 
 public class MQTTBroker {
-	private String ip = GlobalConfig.ip;
-	private int port = GlobalConfig.port;
+	private String ip;
+	private int port;
 	private static HashMap<String, ArrayList<PrintWriter>> map;
 
 	public MQTTBroker() {		
+		ip = GlobalConfig.default_ip;
+		port = GlobalConfig.default_port;
+
 		map = new HashMap<String, ArrayList<PrintWriter>>();
 	}
 

@@ -12,15 +12,21 @@ public class JSONManager {
 		JSONParser parser = new JSONParser();
 		JSONObject obj;
 		
+		System.out.println("JSONManager> jsonMessage : " + jsonMessage);
+		
 		try {
-			obj = (JSONObject) parser.parse(jsonMessage.toString());
+			obj = (JSONObject) parser.parse(jsonMessage);
 			String topic = (String) obj.get("topic");
 			String message = (String) obj.get("message");
 
+			System.out.println("JSONManager> topic : " + topic);
+			System.out.println("JSONManager> message : " + message);
+			
 			return new Message(topic, message);
 		}catch (Exception e) {
-			System.out.println("JSONManager.parseMessage()");
+			System.out.println("Exception occurred> JSONManager.parseMessage()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return null;
@@ -29,10 +35,12 @@ public class JSONManager {
 	public static String createJSONMessage(Message msg) {
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put(msg.topic, msg.message);
+			obj.put("topic", msg.topic);
+			obj.put("message", msg.message);
 		} catch (Exception e) {
-			System.out.println("JSONManager.createJSONMessage()");
+			System.out.println("Exception occurred> JSONManager.createJSONMessage()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return obj.toString();
@@ -49,8 +57,9 @@ public class JSONManager {
 			
 			return parseMessage(jsonMsg.toString());
 		} catch (Exception e) {
-			System.out.println("JSONManager.receiveJSONMessage()");
+			System.out.println("Exception occurred> JSONManager.receiveJSONMessage()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return null;

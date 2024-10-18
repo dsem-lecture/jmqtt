@@ -23,8 +23,9 @@ public class Connection {
 			System.out.println("Connection> reader : " + this.reader);
 			System.out.println("Connection> writer : " + this.writer);
 		} catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.Connection()");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.Connection()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -50,8 +51,9 @@ public class Connection {
 			this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 			this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream()), true);
 		} catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.setConnection(Socket socket)");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.setConnection(Socket socket)");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -62,8 +64,9 @@ public class Connection {
 	        
 	        this.setConnection(socket);
 		} catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.connect()");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.connect()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -76,8 +79,9 @@ public class Connection {
 			this.writer.close();
 			this.socket.close();
 		} catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.disconnect()");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.disconnect()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -88,10 +92,12 @@ public class Connection {
 		try {
 			System.out.println("Connection> sendMessage : " + message);
 			this.writer.println(message);
+			this.writer.println(GlobalConfig.end_message);
 			this.writer.flush();
 		}catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.sendMessage()");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.sendMessage()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -99,23 +105,22 @@ public class Connection {
 	}
 	
 	public String receiveMessage() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String line;
-		String message = null;
-
-		System.out.println("Connection> receiveMessage entered");
-		System.out.println(this.reader);
+		String message = "";
 
 		try {
 			while ((line = this.reader.readLine()) != null) {
+				if (GlobalConfig.end_message.equals(line)) break;
 				sb.append(line);
 	        }
 			
 			message = sb.toString();
 			System.out.println("Connection> receiveMessage : " + message);
 		} catch (Exception e) {
-			System.out.println("Connection> dsem.mqtt4j.global.Connection.receiveMessage()");
+			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.receiveMessage()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return message;

@@ -32,7 +32,9 @@ public class MQTTBroker {
 				System.out.println("MQTTBroker> Client Manager starts.");
 			}
 		} catch (Exception e) {
+			System.out.println("Exception occurred> dsem.mqtt4j.mqtt_broker.MQTTBroker.startBroker()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	

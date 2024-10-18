@@ -73,7 +73,7 @@ public class BrokerConnector {
 
 	public boolean joinSubscriber(String topic) {
 		Message msg = new Message("mqtt4j/subscriber/join", topic);
-		
+				
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
 		System.out.println("BrokerConnector> joinSubscriber topic : " + topic);

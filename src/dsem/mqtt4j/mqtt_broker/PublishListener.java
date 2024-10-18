@@ -16,8 +16,21 @@ class PublishListener extends Thread {
 	}
 
 	public synchronized void publishMessage(Message message) {
+		System.out.println("PublishListener> publish message entered.");
+		
 		ArrayList<Connection> connlist = topicSuberMap.get(message.topic);
+
+		if (connlist == null) {
+			System.out.println("PublishListener> there is no subscriber(topic : " + message.topic + ")");
+			return;
+		}	
+		
 		String sendMessage = JSONManager.createJSONMessage(message);
+
+		System.out.println("PublishListener> sendMessage : " + sendMessage);
+		if (sendMessage == null) return;
+		
+
 		
 		for (int i=0; i<connlist.size(); i++) {
 			Connection connection = connlist.get(i);
@@ -27,6 +40,9 @@ class PublishListener extends Thread {
 			} catch (Exception e) {
 				connection.disconnect();
 				connlist.remove(i);
+				System.out.println("Exception occured> dsem.mqtt4j.mqtt_broker.PublishListener.publishMessage()");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}		
 
@@ -39,11 +55,13 @@ class PublishListener extends Thread {
 				System.out.println("PublishListener> publish message received : " + recvMessage);
 
 				Message message = JSONManager.parseMessage(recvMessage);
+				
 				publishMessage(message);
 			}
 		} catch (Exception e) {
-			System.out.println("PublishListener> dsem.mqtt4j.mqtt_broker.PublishListener.run()");
+			System.out.println("Exception occured> dsem.mqtt4j.mqtt_broker.PublishListener.run()");
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

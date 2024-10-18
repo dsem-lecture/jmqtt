@@ -5,15 +5,14 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.global.structure.*;
 
 public class MQTTBroker {
 	private int port;
-	private static HashMap<String, ArrayList<Connection>> map;
+	static HashMap<String, ArrayList<Connection>> subConnMap;
 
 	public MQTTBroker() {		
 		port = GlobalConfig.default_broker_port;
-		map = new HashMap<String, ArrayList<Connection>>();
+		subConnMap = new HashMap<String, ArrayList<Connection>>();
 	}
 
 	public void startBroker() {
@@ -27,7 +26,7 @@ public class MQTTBroker {
 
 				Connection clientConn = new Connection(socket);
 				
-				ClientManager cm = new ClientManager(clientConn, map);
+				ClientManager cm = new ClientManager(clientConn);
 				cm.start();
 				System.out.println("MQTTBroker> Client Manager starts.");
 			}

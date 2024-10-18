@@ -3,40 +3,51 @@ package dsem.mqtt4j.mqtt_broker;
 import java.io.*;
 import java.util.*;
 import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.global.structure.*;
 
 class PublishListener extends Thread {
 	private Connection conn;
-	private static HashMap<String, ArrayList<Connection>> topicSuberMap;
 
-	public PublishListener(Connection conn, HashMap<String, ArrayList<Connection>> map) {
+	public PublishListener(Connection conn) {
 		super();
 		this.conn = conn;
-		topicSuberMap = map;
 	}
 
+	public void checkConnections(ArrayList<Connection> connlist) {
+		for (int i=0; i<connlist.size(); i++) {
+			Connection connection = connlist.get(i);
+			if (connection.testConnection()) {
+				System.out.println("PublishListener> connection check Client #" + i + " : " + "success");
+			} else {
+				System.out.println("PublishListener> connection check Client #" + i + " : " + "failure");
+				connection.disconnect();
+				System.out.println("PublishListener> Client #" + i + " : " + "removed");
+				connlist.remove(i);
+				i--;
+			}
+		}		
+	}
+	
 	public synchronized void publishMessage(Message message) {
-		System.out.println("PublishListener> publish message entered.");
+		if (message == null) return;
 		
-		ArrayList<Connection> connlist = topicSuberMap.get(message.topic);
+		ArrayList<Connection> connlist = MQTTBroker.subConnMap.get(message.topic);
 
 		if (connlist == null) {
 			System.out.println("PublishListener> there is no subscriber(topic : " + message.topic + ")");
 			return;
-		}	
+		} else {
+			checkConnections(connlist);
+		}
 		
 		String sendMessage = JSONManager.createJSONMessage(message);
-
-		System.out.println("PublishListener> sendMessage : " + sendMessage);
+		System.out.println("PublishListener> Publish message : " + sendMessage);
 		if (sendMessage == null) return;
-		
-
 		
 		for (int i=0; i<connlist.size(); i++) {
 			Connection connection = connlist.get(i);
 			try {
 				connection.sendMessage(sendMessage);
-				System.out.println("PublishListener> Send (topic : " + message.topic + ") #" + i + " > " + sendMessage);
+				System.out.println("PublishListener> Client #" + i + " > publish success");
 			} catch (Exception e) {
 				connection.disconnect();
 				connlist.remove(i);
@@ -53,8 +64,11 @@ class PublishListener extends Thread {
 			while(true) {
 				String recvMessage = this.conn.receiveMessage();
 				System.out.println("PublishListener> publish message received : " + recvMessage);
-
 				Message message = JSONManager.parseMessage(recvMessage);
+				if (message==null && !this.conn.testConnection()) {
+					System.out.println("PublishListener> publisher is disconnected");
+					break;
+				}
 				
 				publishMessage(message);
 			}

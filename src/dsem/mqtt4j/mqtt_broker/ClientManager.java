@@ -4,18 +4,26 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.global.structure.*;
 
 class ClientManager extends Thread {
 	Connection conn;
-	private static HashMap<String, ArrayList<Connection>> topicSuberMap;
 
-	public ClientManager(Connection conn, HashMap<String, ArrayList<Connection>> map) {
+	public ClientManager(Connection conn) {
 		super();
 		this.conn = conn;
-		topicSuberMap = map;
 	}
 
+	public void checkConnList(String topic) {
+		ArrayList<Connection> connlist = MQTTBroker.subConnMap.get(topic);
+
+		if (connlist == null) {
+			System.out.println("ClientManager> there is no subscriber(topic : " + topic + ")");
+			return;
+		}	
+		
+		System.out.println("ClientManager> connlist size : " + connlist.size());
+	}
+	
 	@Override
 	public void run() {
 		try {
@@ -26,26 +34,34 @@ class ClientManager extends Thread {
 			
 			Message message = JSONManager.parseMessage(recvMessage);
 			if (message == null) return;
-
-//			System.out.println("ClientManager> Message received. " + recvMessage);
-//			System.out.println("ClientManager> recived topic : " + message.topic);
-//			System.out.println("ClientManager> recived message : " + message.message);
 			
-			if ("mqtt4j/subscriber/join".equals(message.topic)) {
-				if (topicSuberMap.containsKey(message.message)) {
-					ArrayList<Connection> connList = topicSuberMap.get(message.message);
+			if (Protocol.TOPIC_JOIN_SUBSCRIBER.equals(message.topic)) {
+				System.out.println("ClientManager> topic : " + message.topic);
+				System.out.println("ClientManager> message : " + message.message);
+				String topic = message.message;
+
+				if (MQTTBroker.subConnMap.containsKey(topic)) {
+					System.out.println("ClientManager> topic is contained");
+					
+					ArrayList<Connection> connList = MQTTBroker.subConnMap.get(topic);
 					connList.add(this.conn);
 
-					System.out.println("ClientManager> New subscriber joined (topic : " + message.message + ")");
+					MQTTBroker.subConnMap.put(topic, connList);
+					
+					System.out.println("ClientManager> New subscriber joined (topic : " + topic + ")");
 				} else {
+					System.out.println("ClientManager> topic is not contained");
 					ArrayList<Connection> connList = new ArrayList<Connection>();
 					connList.add(this.conn);
-					topicSuberMap.put(message.topic, connList);
+					MQTTBroker.subConnMap.put(topic, connList);
 
-					System.out.println("ClientManager> New subscriber joined and new topic registered (topic : " + message.message + ")");
+					System.out.println("ClientManager> New subscriber joined and new topic registered (topic : " + topic + ")");
 				}
-			} else if ("mqtt4j/publisher/register".equals(message.topic)) {
-				PublishListener pl = new PublishListener(this.conn, topicSuberMap);
+				
+				checkConnList(topic);
+
+			} else if (Protocol.TOPIC_REGISTER_PUBLISHER.equals(message.topic)) {
+				PublishListener pl = new PublishListener(this.conn);
 				pl.start();
 			} else {
 				System.out.println("ClientManager> topic is not valid.");

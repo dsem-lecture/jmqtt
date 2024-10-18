@@ -1,4 +1,4 @@
-package dsem.mqtt4j.global.structure;
+package dsem.mqtt4j.global;
 
 public class Message {
 	public String topic;

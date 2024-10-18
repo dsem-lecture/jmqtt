@@ -3,7 +3,6 @@ package dsem.mqtt4j.client;
 import java.io.*;
 import java.net.*;
 import dsem.mqtt4j.global.*;
-import dsem.mqtt4j.global.structure.*;
 
 public class BrokerConnector {
 	public Connection conn;
@@ -34,9 +33,10 @@ public class BrokerConnector {
 			System.out.println("BrokerConnector> MQTTBroker connection is success.");
 		} else {
 			System.out.println("BrokerConnector> MQTTBroker connection is failed.");
+			return false;
 		}
 		
-		return false;
+		return true;
 	}
 
 	public boolean disconnectBroker() {
@@ -49,7 +49,7 @@ public class BrokerConnector {
 	}
 
 	public boolean registerPublisher() {
-		Message msg = new Message("mqtt4j/publisher/register", "Publisher registration");
+		Message msg = new Message(Protocol.TOPIC_REGISTER_PUBLISHER, "Publisher registration");
 		
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
@@ -72,12 +72,9 @@ public class BrokerConnector {
 	}
 
 	public boolean joinSubscriber(String topic) {
-		Message msg = new Message("mqtt4j/subscriber/join", topic);
+		Message msg = new Message(Protocol.TOPIC_JOIN_SUBSCRIBER, topic);
 				
 		String jsonMsg = JSONManager.createJSONMessage(msg);
-		
-		System.out.println("BrokerConnector> joinSubscriber topic : " + topic);
-		System.out.println("BrokerConnector> JSONManager : " + jsonMsg);
 		
 		if (conn.sendMessage(jsonMsg)) {
 			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
@@ -87,13 +84,16 @@ public class BrokerConnector {
 	}
 	
 	public String subscirbe() {
-		while (true) {
-			String recvMsg = conn.receiveMessage();
-			Message subMsg = JSONManager.parseMessage(recvMsg);
-
-			System.out.println("BrokerConnector> subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
-			
-			return subMsg.message; 
-		}
+		String recvMsg = conn.receiveMessage();
+		if (recvMsg == null) 
+			return null;
+		
+		Message subMsg = JSONManager.parseMessage(recvMsg);
+		if (subMsg == null)
+			return null;
+		
+		System.out.println("BrokerConnector> subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
+		
+		return subMsg.message; 
 	}
 }

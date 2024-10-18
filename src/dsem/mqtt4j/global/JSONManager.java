@@ -2,26 +2,21 @@ package dsem.mqtt4j.global;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
-
-import dsem.mqtt4j.global.structure.*;
-
 import java.io.*;
 
 public class JSONManager {
 	public static Message parseMessage(String jsonMessage) {
+		if (jsonMessage == null)
+			return null;
+		
 		JSONParser parser = new JSONParser();
 		JSONObject obj;
-		
-		System.out.println("JSONManager> jsonMessage : " + jsonMessage);
 		
 		try {
 			obj = (JSONObject) parser.parse(jsonMessage);
 			String topic = (String) obj.get("topic");
 			String message = (String) obj.get("message");
 
-			System.out.println("JSONManager> topic : " + topic);
-			System.out.println("JSONManager> message : " + message);
-			
 			return new Message(topic, message);
 		}catch (Exception e) {
 			System.out.println("Exception occurred> JSONManager.parseMessage()");

@@ -26,7 +26,7 @@ public class MQTTBroker {
 
 				Connection clientConn = new Connection(socket);
 				
-				SubscriberManager sm = new SubscriberManager(clientConn, map);
+				ClientManager sm = new ClientManager(clientConn, map);
 				sm.start();
 			}
 		} catch (Exception e) {

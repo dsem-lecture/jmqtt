@@ -7,23 +7,23 @@ import dsem.mqtt4j.global.structure.*;
 
 class PublishListener extends Thread {
 	private Connection conn;
-	private static HashMap<String, ArrayList<Connection>> map;
+	private static HashMap<String, ArrayList<Connection>> topicSuberMap;
 
 	public PublishListener(Connection conn, HashMap<String, ArrayList<Connection>> map) {
 		super();
 		this.conn = conn;
-		this.map = map;
+		topicSuberMap = map;
 	}
 
 	public synchronized void publishMessage(Message message) {
-		ArrayList<Connection> connlist = map.get(message.topic);
+		ArrayList<Connection> connlist = topicSuberMap.get(message.topic);
 		String sendMessage = JSONManager.createJSONMessage(message);
 		
 		for (int i=0; i<connlist.size(); i++) {
 			Connection connection = connlist.get(i);
 			try {
 				connection.sendMessage(sendMessage);
-				System.out.println("Send " + i + " > " + sendMessage);
+				System.out.println("Send (topic : " + message.topic + ") #" + i + " > " + sendMessage);
 			} catch (Exception e) {
 				connection.disconnect();
 				connlist.remove(i);
@@ -42,7 +42,7 @@ class PublishListener extends Thread {
 				publishMessage(message);
 			}
 		} catch (Exception e) {
-			System.out.println("catch");
+			System.out.println("dsem.mqtt4j.mqtt_broker.PublishListener.run()");
 			System.out.println(e.getMessage());
 		}
 	}

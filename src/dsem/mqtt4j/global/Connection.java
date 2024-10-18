@@ -24,17 +24,6 @@ public class Connection {
 			System.out.println(e.getMessage());
 		}
 	}
-	
-	public void setConnection(Socket socket) {
-		this.socket = socket;
-		try {
-			this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-			this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream()), true);
-		} catch (Exception e) {
-			System.out.println("dsem.mqtt4j.global.Connection.setConnection(Socket socket)");
-			System.out.println(e.getMessage());
-		}
-	}
 
 	public Socket getSocket() {
 		return socket;
@@ -52,13 +41,18 @@ public class Connection {
 		return writer;
 	}
 	
-	public boolean sendMessage(String message) {
-		this.writer.println(message);
-		this.writer.flush();
-		return true;
+	public void setConnection(Socket socket) {
+		this.socket = socket;
+		try {
+			this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+			this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream()), true);
+		} catch (Exception e) {
+			System.out.println("dsem.mqtt4j.global.Connection.setConnection(Socket socket)");
+			System.out.println(e.getMessage());
+		}
 	}
-	
-	public void connect(String ip, int port) {
+
+	public boolean connect(String ip, int port) {
 		try {
 			Socket socket = new Socket(ip, port);
 	        System.out.println("MQTTBroker is connected.");
@@ -67,10 +61,13 @@ public class Connection {
 		} catch (Exception e) {
 			System.out.println("dsem.mqtt4j.global.Connection.connect()");
 			System.out.println(e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
-	public void disconnect() {
+	public boolean disconnect() {
 		try {
 			this.reader.close();
 			this.writer.close();
@@ -78,7 +75,23 @@ public class Connection {
 		} catch (Exception e) {
 			System.out.println("dsem.mqtt4j.global.Connection.disconnect()");
 			System.out.println(e.getMessage());
+			return false;
 		}
+		
+		return true;
+	}
+
+	public boolean sendMessage(String message) {
+		try {
+			this.writer.println(message);
+			this.writer.flush();
+		}catch (Exception e) {
+			System.out.println("dsem.mqtt4j.global.Connection.sendMessage()");
+			System.out.println(e.getMessage());
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public String receiveMessage() {

@@ -19,6 +19,14 @@ public class BrokerConnector {
 		this.broker_ip = ip;
 		this.broker_port = port;
 	}
+
+	public Connection getConn() {
+		return conn;
+	}
+
+	public void setConn(Connection conn) {
+		this.conn = conn;
+	}
 	
 	public boolean connectBroker() {
 		if (this.conn.getSocket() == null || this.conn.getSocket().isClosed()) {
@@ -32,7 +40,6 @@ public class BrokerConnector {
 	}
 
 	public boolean disconnectBroker() {
-		
 		if (this.conn.getSocket() != null && this.conn.getSocket().isClosed()) {
 			this.conn.connect(broker_ip, broker_port);
 			System.out.println("MQTTBroker is connected successfully.");
@@ -40,6 +47,50 @@ public class BrokerConnector {
 		
 		return false;
 	}
+
+	public boolean registerPublisher() {
+		Message msg = new Message("mqtt4j//publisher//register", "Publisher registration");
+		
+		String jsonMsg = JSONManager.createJSONMessage(msg);
+		
+		if (conn.sendMessage(jsonMsg)) {
+			System.out.println("publish (topic: " + msg.topic + ") : " + msg.message);
+		}
+		
+		return true;
+	}
 	
+	public boolean publishMessage(String topic, String message) {
+		Message msg = new Message(topic, message);
+		String jsonMsg = JSONManager.createJSONMessage(msg);
+		
+		if (conn.sendMessage(jsonMsg)) {
+			System.out.println("publish (topic: " + topic + ") : " + message);
+		}
+		
+		return true;
+	}
+
+	public boolean joinSubscriber(String topic) {
+		Message msg = new Message("mqtt4j//subscriber//join", topic);
+		
+		String jsonMsg = JSONManager.createJSONMessage(msg);
+		
+		if (conn.sendMessage(jsonMsg)) {
+			System.out.println("publish (topic: " + msg.topic + ") : " + msg.message);
+		}
+		
+		return true;
+	}
 	
+	public String subscirbe() {
+		while (true) {
+			String recvMsg = conn.receiveMessage();
+			Message subMsg = JSONManager.parseMessage(recvMsg);
+
+			System.out.println("subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
+			
+			return subMsg.message; 
+		}
+	}
 }

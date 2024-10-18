@@ -16,34 +16,36 @@ class ClientManager extends Thread {
 		topicSuberMap = map;
 	}
 
+	@Override
 	public void run() {
 		try {
-			System.out.println("Client is connected.");
+			System.out.println("ClientManager> Client is connected.");
 
 			String recvMessage = this.conn.receiveMessage();
 			Message message = JSONManager.parseMessage(recvMessage);
 
-			if ("mqtt4j//subscriber//join".equals(message.topic)) {
+			System.out.println("ClientManager> Message received. " + recvMessage);
+			if ("mqtt4j/subscriber/join".equals(message.topic)) {
 				if (topicSuberMap.containsKey(message.message)) {
 					ArrayList<Connection> connList = topicSuberMap.get(message.message);
 					connList.add(this.conn);
 
-					System.out.println("New subscriber joined (topic : " + message.message + ")");
+					System.out.println("ClientManager> New subscriber joined (topic : " + message.message + ")");
 				} else {
 					ArrayList<Connection> connList = new ArrayList<Connection>();
 					connList.add(this.conn);
 					topicSuberMap.put(message.topic, connList);
 
-					System.out.println("New subscriber joined and new topic registered (topic : " + message.message + ")");
+					System.out.println("ClientManager> New subscriber joined and new topic registered (topic : " + message.message + ")");
 				}
-			} else if ("mqtt4j//publisher//register".equals(message.topic)) {
+			} else if ("mqtt4j/publisher/register".equals(message.topic)) {
 				PublishListener pl = new PublishListener(this.conn, topicSuberMap);
 				pl.start();
 			}
 
 
 		} catch (Exception e) {
-			System.out.println("dsem.mqtt4j.mqtt_broker.SubscriberManager.run()");
+			System.out.println("ClientManager> dsem.mqtt4j.mqtt_broker.SubscriberManager.run()");
 			System.out.println(e.getMessage());
 		}
 	}

@@ -23,7 +23,7 @@ class PublishListener extends Thread {
 			Connection connection = connlist.get(i);
 			try {
 				connection.sendMessage(sendMessage);
-				System.out.println("Send (topic : " + message.topic + ") #" + i + " > " + sendMessage);
+				System.out.println("PublishListener> Send (topic : " + message.topic + ") #" + i + " > " + sendMessage);
 			} catch (Exception e) {
 				connection.disconnect();
 				connlist.remove(i);
@@ -36,13 +36,13 @@ class PublishListener extends Thread {
 		try {
 			while(true) {
 				String recvMessage = this.conn.receiveMessage();
-				System.out.println("publish message received : " + recvMessage);
+				System.out.println("PublishListener> publish message received : " + recvMessage);
 
 				Message message = JSONManager.parseMessage(recvMessage);
 				publishMessage(message);
 			}
 		} catch (Exception e) {
-			System.out.println("dsem.mqtt4j.mqtt_broker.PublishListener.run()");
+			System.out.println("PublishListener> dsem.mqtt4j.mqtt_broker.PublishListener.run()");
 			System.out.println(e.getMessage());
 		}
 	}

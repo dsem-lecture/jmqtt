@@ -31,9 +31,9 @@ public class BrokerConnector {
 	public boolean connectBroker() {
 		if (this.conn.getSocket() == null || this.conn.getSocket().isClosed()) {
 			this.conn.connect(broker_ip, broker_port);
-			System.out.println("MQTTBroker connection is success.");
+			System.out.println("BrokerConnector> MQTTBroker connection is success.");
 		} else {
-			System.out.println("MQTTBroker connection is failed.");
+			System.out.println("BrokerConnector> MQTTBroker connection is failed.");
 		}
 		
 		return false;
@@ -42,19 +42,19 @@ public class BrokerConnector {
 	public boolean disconnectBroker() {
 		if (this.conn.getSocket() != null && this.conn.getSocket().isClosed()) {
 			this.conn.connect(broker_ip, broker_port);
-			System.out.println("MQTTBroker is connected successfully.");
+			System.out.println("BrokerConnector> MQTTBroker is connected successfully.");
 		}
 		
 		return false;
 	}
 
 	public boolean registerPublisher() {
-		Message msg = new Message("mqtt4j//publisher//register", "Publisher registration");
+		Message msg = new Message("mqtt4j/publisher/register", "Publisher registration");
 		
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
 		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("publish (topic: " + msg.topic + ") : " + msg.message);
+			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
 		}
 		
 		return true;
@@ -65,19 +65,22 @@ public class BrokerConnector {
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
 		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("publish (topic: " + topic + ") : " + message);
+			System.out.println("BrokerConnector> publish (topic: " + topic + ") : " + message);
 		}
 		
 		return true;
 	}
 
 	public boolean joinSubscriber(String topic) {
-		Message msg = new Message("mqtt4j//subscriber//join", topic);
+		Message msg = new Message("mqtt4j/subscriber/join", topic);
 		
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
+		System.out.println("BrokerConnector> joinSubscriber topic : " + topic);
+		System.out.println("BrokerConnector> JSONManager : " + jsonMsg);
+		
 		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("publish (topic: " + msg.topic + ") : " + msg.message);
+			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
 		}
 		
 		return true;
@@ -88,7 +91,7 @@ public class BrokerConnector {
 			String recvMsg = conn.receiveMessage();
 			Message subMsg = JSONManager.parseMessage(recvMsg);
 
-			System.out.println("subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
+			System.out.println("BrokerConnector> subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
 			
 			return subMsg.message; 
 		}

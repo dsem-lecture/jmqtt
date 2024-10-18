@@ -18,16 +18,18 @@ public class MQTTBroker {
 
 	public void startBroker() {
 		try (ServerSocket serverSocket = new ServerSocket(this.port)) {
-			System.out.println("MQTT Broker started");
+			System.out.println("MQTTBroker> MQTT Broker starts.");
 
 			while (true) {
+				System.out.println("MQTTBroker> Waiting for clients....");
 				Socket socket = serverSocket.accept();
-				System.out.println("Connection Requested.");
+				System.out.println("MQTTBroker> Connection Requested.");
 
 				Connection clientConn = new Connection(socket);
 				
-				ClientManager sm = new ClientManager(clientConn, map);
-				sm.start();
+				ClientManager cm = new ClientManager(clientConn, map);
+				cm.start();
+				System.out.println("MQTTBroker> Client Manager starts.");
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

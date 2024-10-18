@@ -11,7 +11,8 @@ public class SubscriberExample {
 		
 		bc.connectBroker();
 		
-		String topic = "test//publisher1//sensor";
+		String topic = "test/publisher1/sensor";
+		
 		bc.joinSubscriber(topic);
 		
 		while (true) {

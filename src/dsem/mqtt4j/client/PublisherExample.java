@@ -12,7 +12,7 @@ public class PublisherExample {
 		bc.connectBroker();
 		bc.registerPublisher();
 		
-		String topic = "test//publisher1//sensor";
+		String topic = "test/publisher1/sensor";
 		try {
 			while(true) {
 				int value = (int)(Math.random()*100);

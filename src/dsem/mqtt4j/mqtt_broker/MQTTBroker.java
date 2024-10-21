@@ -16,7 +16,9 @@ public class MQTTBroker {
 	}
 
 	public void startBroker() {
+		
 		try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+			System.out.println("MQTTBroker> IP : " + InetAddress.getLocalHost().getHostAddress() + "| port : " + this.port);
 			System.out.println("MQTTBroker> MQTT Broker starts.");
 
 			while (true) {

@@ -29,22 +29,25 @@ public class BrokerConnector {
 	
 	public boolean connectBroker() {
 		if (this.conn.getSocket() == null || this.conn.getSocket().isClosed()) {
-			this.conn.connect(broker_ip, broker_port);
-			System.out.println("BrokerConnector> MQTTBroker connection is success.");
-		} else {
-			System.out.println("BrokerConnector> MQTTBroker connection is failed.");
-			return false;
-		}
-		
-		return true;
+			if (this.conn.connect(broker_ip, broker_port)) {
+				System.out.println("BrokerConnector> MQTTBroker connection is success.");
+				return true;
+			}
+		} 
+			
+		System.out.println("BrokerConnector> MQTTBroker connection is failed.");
+		return false;
 	}
 
 	public boolean disconnectBroker() {
 		if (this.conn.getSocket() != null && this.conn.getSocket().isClosed()) {
-			this.conn.connect(broker_ip, broker_port);
-			System.out.println("BrokerConnector> MQTTBroker is connected successfully.");
+			if (this.conn.disconnect()) {
+				System.out.println("BrokerConnector> MQTTBroker is connected successfully.");
+				return true;
+			}
 		}
 		
+		System.out.println("BrokerConnector> MQTTBroker disconnection is failed.");
 		return false;
 	}
 
@@ -55,9 +58,10 @@ public class BrokerConnector {
 		
 		if (conn.sendMessage(jsonMsg)) {
 			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
+			return true;
 		}
 		
-		return true;
+		return false;		
 	}
 	
 	public boolean publishMessage(String topic, String message) {
@@ -66,9 +70,11 @@ public class BrokerConnector {
 		
 		if (conn.sendMessage(jsonMsg)) {
 			System.out.println("BrokerConnector> publish (topic: " + topic + ") : " + message);
+			return true;
+
 		}
 		
-		return true;
+		return false;		
 	}
 
 	public boolean joinSubscriber(String topic) {
@@ -78,9 +84,10 @@ public class BrokerConnector {
 		
 		if (conn.sendMessage(jsonMsg)) {
 			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	public String subscirbe() {

@@ -7,4 +7,5 @@ public class Protocol {
 	
 	public final static String TOPIC_JOIN_SUBSCRIBER = "mqtt4j/subscriber/join";
 	public final static String TOPIC_REGISTER_PUBLISHER = "mqtt4j/publisher/register";
+	public final static String TOPIC_UNREGISTER_PUBLISHER = "mqtt4j/publisher/unregister";
 }

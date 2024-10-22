@@ -18,7 +18,7 @@ public class SubscriberExample {
 		while (true) {
 			String message = bc.subscirbe();
 			if (message != null) {
-				System.out.println(topic + "> " + message);
+				System.out.println("Subscriber> " + topic + " : " + message);
 			}
 		}
 	}

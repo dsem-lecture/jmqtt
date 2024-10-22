@@ -83,22 +83,10 @@ public class Connection {
 		return true;
 	}
 
-	public boolean testConnection() {
-		try {
-			this.writer.println(Protocol.CONNECTED);
-			this.writer.flush();
-
-			String line = this.reader.readLine();
-			if(Protocol.ACK.equals(line)) {
-				return true;
-			}
-		} catch (Exception e) {
-			System.out.println("Exception occurred> disconnected");
-//			System.out.println(e.getMessage());
-//			e.printStackTrace();
-		}
-		
-		return false;
+	public void sendConnected() {
+		this.writer.println(Protocol.CONNECTED);
+		this.writer.flush();
+//		System.out.println("Connection> send Connected protocol : " + Protocol.CONNECTED);
 	}
 	
 	public void sendAck() {
@@ -129,13 +117,13 @@ public class Connection {
 		String message = "";
 
 		try {
+//			System.out.println(this + "Connection> here comes receiveMessage() : ");
 			while ((line = this.reader.readLine()) != null) {
+//				System.out.println(this + "Connection> received message line : " + line);
+
 				if (Protocol.MESSAGE_END.equals(line)) {
 					break;
-				} else if(Protocol.CONNECTED.equals(line)) {
-					sendAck();					
-					continue;
-				}
+				} 
 				
 				sb.append(line);
 	        }

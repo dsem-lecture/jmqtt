@@ -15,15 +15,15 @@ class PublishListener extends Thread {
 	public void checkConnections(ArrayList<Connection> connlist) {
 		for (int i=0; i<connlist.size(); i++) {
 			Connection connection = connlist.get(i);
-			if (connection.testConnection()) {
-				System.out.println("PublishListener> connection check Client #" + i + " : " + "success");
-			} else {
-				System.out.println("PublishListener> connection check Client #" + i + " : " + "failure");
-				connection.disconnect();
-				System.out.println("PublishListener> Client #" + i + " : " + "removed");
-				connlist.remove(i);
-				i--;
-			}
+//			if (connection.testConnection()) {
+//				System.out.println("PublishListener> connection check Client #" + i + " : " + "success");
+//			} else {
+//				System.out.println("PublishListener> connection check Client #" + i + " : " + "failure");
+//				connection.disconnect();
+//				System.out.println("PublishListener> Client #" + i + " : " + "removed");
+//				connlist.remove(i);
+//				i--;
+//			}
 		}		
 	}
 	
@@ -65,10 +65,10 @@ class PublishListener extends Thread {
 				String recvMessage = this.conn.receiveMessage();
 				System.out.println("PublishListener> publish message received : " + recvMessage);
 				Message message = JSONManager.parseMessage(recvMessage);
-				if (message==null && !this.conn.testConnection()) {
-					System.out.println("PublishListener> publisher is disconnected");
-					break;
-				}
+//				if (message==null && !this.conn.testConnection()) {
+//					System.out.println("PublishListener> publisher is disconnected");
+//					break;
+//				}
 				
 				publishMessage(message);
 			}

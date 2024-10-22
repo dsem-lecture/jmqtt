@@ -17,9 +17,8 @@ public class PublisherExample {
 			while(true) {
 				int value = (int)(Math.random()*100);
 				
-				System.out.println("Publish ("+ topic +") : " + value);
+				System.out.println("Publisher> publish ("+ topic +") : " + value);
 				bc.publishMessage(topic, String.valueOf(value));
-				
 				Thread.sleep(5000);
 			}
 		} catch (Exception e) {

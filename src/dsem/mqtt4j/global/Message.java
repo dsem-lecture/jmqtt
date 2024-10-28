@@ -12,4 +12,9 @@ public class Message {
 		this.topic = topic;
 		this.message = message;
 	}
+	
+	@Override
+	public String toString() {
+		return message + "(" + topic + ")"; 
+	}
 }

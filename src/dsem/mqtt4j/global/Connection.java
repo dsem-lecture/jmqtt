@@ -86,18 +86,15 @@ public class Connection {
 	public void sendConnected() {
 		this.writer.println(Protocol.CONNECTED);
 		this.writer.flush();
-//		System.out.println("Connection> send Connected protocol : " + Protocol.CONNECTED);
 	}
 	
 	public void sendAck() {
 		this.writer.println(Protocol.ACK);
 		this.writer.flush();
-//		System.out.println("Connection> send Acknowledgement protocol : " + Protocol.ACK);
 	}
 	
 	public boolean sendMessage(String message) {
 		try {
-//			System.out.println("Connection> sendMessage : " + message);
 			this.writer.println(message);
 			this.writer.println(Protocol.MESSAGE_END);
 			this.writer.flush();
@@ -117,10 +114,7 @@ public class Connection {
 		String message = "";
 
 		try {
-//			System.out.println(this + "Connection> here comes receiveMessage() : ");
 			while ((line = this.reader.readLine()) != null) {
-//				System.out.println(this + "Connection> received message line : " + line);
-
 				if (Protocol.MESSAGE_END.equals(line)) {
 					break;
 				} 
@@ -129,7 +123,6 @@ public class Connection {
 	        }
 			
 			message = sb.toString();
-//			System.out.println("Connection> receiveMessage : " + message);
 		} catch (Exception e) {
 			System.out.println("Exception occurred> dsem.mqtt4j.global.Connection.receiveMessage()");
 			System.out.println(e.getMessage());

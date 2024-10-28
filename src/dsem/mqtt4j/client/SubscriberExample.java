@@ -9,17 +9,21 @@ public class SubscriberExample {
 		
 		BrokerConnector bc = new BrokerConnector(broker_ip, broker_port);
 		
-		bc.connectBroker();
-		
-		String topic = "default/topic/test";
-		
-		bc.joinSubscriber(topic);
-		
-		while (true) {
-			String message = bc.subscirbe();
-			if (message != null) {
-				System.out.println("Subscriber> " + topic + " : " + message);
+		if (bc.connectBroker()) {
+			System.out.println("Subscriber> MQTTBroker connected.");
+
+			String topic = "default/topic/test";
+			if (bc.joinSubscriber(topic)) {
+				System.out.println("Subscriber> subscribe (" + topic + ")");
+				while (true) {
+					String message = bc.subscirbe();
+					if (message != null) {
+						System.out.println("Subscriber> " + topic + " : " + message);
+					}
+				}
 			}
+			
 		}
+		
 	}
 }

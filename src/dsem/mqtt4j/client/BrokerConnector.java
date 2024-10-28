@@ -1,7 +1,5 @@
 package dsem.mqtt4j.client;
 
-import java.io.*;
-import java.net.*;
 import dsem.mqtt4j.global.*;
 
 public class BrokerConnector {
@@ -29,25 +27,18 @@ public class BrokerConnector {
 	
 	public boolean connectBroker() {
 		if (this.conn.getSocket() == null || this.conn.getSocket().isClosed()) {
-			if (this.conn.connect(broker_ip, broker_port)) {
-				System.out.println("BrokerConnector> MQTTBroker connection is success.");
+			if (this.conn.connect(broker_ip, broker_port)) 
 				return true;
-			}
 		} 
 			
-		System.out.println("BrokerConnector> MQTTBroker connection is failed.");
 		return false;
 	}
 
 	public boolean disconnectBroker() {
 		if (this.conn.getSocket() != null && this.conn.getSocket().isClosed()) {
-			if (this.conn.disconnect()) {
-				System.out.println("BrokerConnector> MQTTBroker is connected successfully.");
+			if (this.conn.disconnect()) 
 				return true;
-			}
 		}
-		
-		System.out.println("BrokerConnector> MQTTBroker disconnection is failed.");
 		return false;
 	}
 
@@ -56,10 +47,8 @@ public class BrokerConnector {
 		
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
-		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
+		if (conn.sendMessage(jsonMsg)) 
 			return true;
-		}
 		
 		return false;		
 	}
@@ -67,12 +56,8 @@ public class BrokerConnector {
 	public boolean publishMessage(String topic, String message) {
 		Message msg = new Message(topic, message);
 		String jsonMsg = JSONManager.createJSONMessage(msg);
-		
-		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("BrokerConnector> publish (topic: " + topic + ") : " + message);
+		if (conn.sendMessage(jsonMsg)) 
 			return true;
-
-		}
 		
 		return false;		
 	}
@@ -82,10 +67,8 @@ public class BrokerConnector {
 				
 		String jsonMsg = JSONManager.createJSONMessage(msg);
 		
-		if (conn.sendMessage(jsonMsg)) {
-			System.out.println("BrokerConnector> publish (topic: " + msg.topic + ") : " + msg.message);
+		if (conn.sendMessage(jsonMsg))
 			return true;
-		}
 		
 		return false;
 	}
@@ -98,8 +81,6 @@ public class BrokerConnector {
 		Message subMsg = JSONManager.parseMessage(recvMsg);
 		if (subMsg == null)
 			return null;
-		
-		System.out.println("BrokerConnector> subscribe (topic: " + subMsg.topic + ") : " + subMsg.message);
 		
 		return subMsg.message; 
 	}

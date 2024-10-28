@@ -9,22 +9,26 @@ public class PublisherExample {
 		
 		BrokerConnector bc = new BrokerConnector(broker_ip, broker_port);
 		
-		bc.connectBroker();
-		bc.registerPublisher();
-		
-		String topic = "default/topic/test";
-		try {
-			while(true) {
-				int value = (int)(Math.random()*100);
+		if (bc.connectBroker()) {
+			System.out.println("Publisher> MQTTBroker connected.");
+			if (bc.registerPublisher()) {
+				System.out.println("Publisher> This publisher is registered.");
+
+				String topic = "default/topic/test";
+				try {
+					while(true) {
+						int value = (int)(Math.random()*100);
+						
+						System.out.println("Publisher> publish ("+ topic +") : " + value);
+						bc.publishMessage(topic, String.valueOf(value));
+						Thread.sleep(10000);
+					}
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				
-				System.out.println("Publisher> publish ("+ topic +") : " + value);
-				bc.publishMessage(topic, String.valueOf(value));
-				Thread.sleep(5000);
+				System.out.println("Publisher finished.");
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
 		}
-		
-		System.out.println("Publisher finished.");
 	}
 }
